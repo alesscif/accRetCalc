@@ -19,7 +19,6 @@ public class Main {
     private static final double APY_AFTER_INFLATION = 3;
     private static final double INFLATION_PERCENT = 4;
 
-
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
@@ -40,7 +39,6 @@ public class Main {
         int salaryAdjustmentToggle = 0; // Used for bi-yearly increases
 
         while (currentYear < BIRTHDAY.plusYears(RETIREMENT_AGE).getYear()) {
-
             currentSalary = salaryAdjustmentToggle == 0 ? currentSalary + BI_YEARLY_SALARY_GROWTH : currentSalary;
             accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, MONTHLY_SPEND, RENT);
             MONTHLY_SPEND = inflationAdjust(MONTHLY_SPEND, INFLATION_PERCENT);
