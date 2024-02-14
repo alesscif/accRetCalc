@@ -15,8 +15,8 @@ public class Main {
     private static final double socialSecurityWageLimit = 168600;
     private static final double[] bracketTaxRates = {0, 0.10, 0.12, 0.22, 0.24, 0.32, 0.35, 0.37};
     private static double preTaxRetirementLimit = 23000;
-    private static final double apyAfterInflation = 3; // Changed to camelCase
-    private static final double inflationPercent = 4; // Changed to camelCase
+    private static final double apyAfterInflation = 3;
+    private static final double inflationPercent = 4;
 
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
