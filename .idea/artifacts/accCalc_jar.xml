@@ -1,11 +1,12 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="accCalc:jar">
-    <output-path>$PROJECT_DIR$/..</output-path>
+    <output-path>$PROJECT_DIR$/out/artifacts/accCalc_jar</output-path>
     <root id="archive" name="accCalc.jar">
       <element id="module-output" name="accCalc" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/poi/poi/3.17/poi-3.17.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.10/commons-codec-1.10.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-collections4/4.1/commons-collections4-4.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

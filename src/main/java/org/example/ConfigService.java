@@ -30,6 +30,8 @@ public class ConfigService {
         int counter = 1;
         Class<? extends Config> configClass = config.getClass();
 
+        System.out.println();
+
         for (Field field : configClass.getDeclaredFields()) {
             try {
                 field.setAccessible(true);

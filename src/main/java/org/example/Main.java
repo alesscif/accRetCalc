@@ -26,7 +26,7 @@ public class Main {
     private static final double inflationPercent = 4;
 
     public static void main(String[] args) {
-        String configFilename = "src/main/resources/profile.json";
+        String configFilename = "profile.json";
 
         ConfigService configService = new ConfigService(configFilename, new Scanner(System.in));
 
