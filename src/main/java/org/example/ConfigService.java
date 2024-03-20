@@ -12,13 +12,18 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class ConfigService {
-    private Config config;
-    private String filename;
-    private Scanner input;
+    private final Config config;
+    private final String filename;
+    private final Scanner input;
+    private final Gson gson;
 
     public ConfigService(String filename, Scanner input) {
         this.filename = filename;
         this.input = input;
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .setPrettyPrinting()
+                .create();
         this.config = loadConfig();
     }
 
@@ -46,10 +51,6 @@ public class ConfigService {
 
     private Config loadConfig() {
         try (Reader reader = new FileReader(filename)) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                    .setPrettyPrinting()
-                    .create();
             Config config = gson.fromJson(reader, Config.class);
             return Objects.requireNonNullElseGet(config, Config::new);
         } catch (IOException e) {
@@ -84,7 +85,7 @@ public class ConfigService {
         Field[] fields = Config.class.getDeclaredFields();
         if (choice >= 1 && choice <= fields.length) {
             Field fieldToUpdate = fields[choice - 1];
-            fieldToUpdate.setAccessible(true); // Allow access to private fields
+            fieldToUpdate.setAccessible(true);
 
             if (fieldToUpdate.getType() == LocalDate.class) {
                 fieldToUpdate.set(config, getDateFromUser("Enter new " + fieldToUpdate.getName() + " (YYYY-MM-DD): "));
@@ -100,10 +101,6 @@ public class ConfigService {
 
     private void saveConfig() {
         try (Writer writer = new FileWriter(filename)) {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                    .setPrettyPrinting()
-                    .create();
             gson.toJson(config, writer);
         } catch (IOException e) {
             System.err.println("Error saving config: " + e.getMessage());
