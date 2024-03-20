@@ -36,9 +36,7 @@ public class ConfigService {
             try {
                 field.setAccessible(true);
                 Object fieldValue = field.get(config);
-                if (fieldValue != null) {
-                    System.out.println(counter + ". " + field.getName() + ": " + fieldValue);
-                }
+                System.out.println(counter + ". " + field.getName() + ": " + fieldValue);
                 counter++;
             } catch (IllegalAccessException e) {
                 System.err.println("Error accessing field: " + field.getName());
