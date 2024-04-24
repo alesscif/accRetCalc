@@ -3,8 +3,7 @@ package org.example;
 import java.time.LocalDate;
 
 public class Config {
-    private LocalDate birthday;
-    private LocalDate startDate;
+    private int startingAge;
     private int startingSalary;
     private int biYearlySalaryGrowth;
     private int retirementAge;
@@ -40,20 +39,12 @@ public class Config {
         this.spendingFirst = spendingFirst;
     }
 
-    public LocalDate getBirthday() {
-        return birthday;
+    public int getStartingAge() {
+        return startingAge;
     }
 
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+    public void setStartingAge(int startingAge) {
+        this.startingAge = startingAge;
     }
 
     public int getStartingSalary() {
