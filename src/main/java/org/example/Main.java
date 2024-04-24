@@ -51,7 +51,7 @@ public class Main {
         if (spendingFirst) {
             int withdrawalYears = birthday.plusYears(100).getYear() - birthday.plusYears(currentYear).getYear();
             double initialWithdrawal = pmt(apyAfterInflation / 100, withdrawalYears, accumulatedSavings * -1, 0, true);
-            double spendToRentRatio = (double) monthlySpend / rent;
+            double spendToRentRatio = rent == 0 ? 0 : (double) monthlySpend / rent;
 
             while (initialWithdrawal / 12 < targetMonthlySpending && currentYear < birthday.getYear() + 100) {
                 currentSalary = salaryAdjustmentToggle == 0 ? currentSalary + biYearlySalaryGrowth : currentSalary;
