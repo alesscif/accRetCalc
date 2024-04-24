@@ -12,6 +12,33 @@ public class Config {
     private int rent;
     private int startingSavings;
     private int ny;
+    private boolean spendingFirst;
+    private int targetMonthlySpending;
+    private int targetSavingsRatePercent;
+
+    public int getTargetSavingsRatePercent() {
+        return targetSavingsRatePercent;
+    }
+
+    public void setTargetSavingsRatePercent(int targetSavingsRate) {
+        this.targetSavingsRatePercent = targetSavingsRate;
+    }
+
+    public int getTargetMonthlySpending() {
+        return targetMonthlySpending;
+    }
+
+    public void setTargetMonthlySpending(int targetMonthlySpending) {
+        this.targetMonthlySpending = targetMonthlySpending;
+    }
+
+    public boolean isSpendingFirst() {
+        return spendingFirst;
+    }
+
+    public void setSpendingFirst(boolean spendingFirst) {
+        this.spendingFirst = spendingFirst;
+    }
 
     public LocalDate getBirthday() {
         return birthday;

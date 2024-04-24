@@ -1,11 +1,14 @@
 {
   "birthday": "1999-11-12",
-  "startDate": "2024-11-12",
-  "startingSalary": 0,
-  "biYearlySalaryGrowth": 0,
+  "startDate": "2025-11-12",
+  "startingSalary": 80000,
+  "biYearlySalaryGrowth": 25000,
   "retirementAge": 0,
-  "monthlySpend": 0,
-  "rent": 0,
+  "monthlySpend": 1800,
+  "rent": 700,
   "startingSavings": 0,
-  "ny": 0
+  "ny": 0,
+  "spendingFirst": true,
+  "targetMonthlySpending": 5000,
+  "targetSavingsRatePercent": 50
 }

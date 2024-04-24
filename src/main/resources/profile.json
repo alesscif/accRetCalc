@@ -7,5 +7,8 @@
   "monthlySpend": 1200,
   "rent": 800,
   "startingSavings": 0,
-  "ny": 0
+  "ny": 0,
+  "spendingFirst": true,
+  "targetMonthlySpending": 5000,
+  "targetSavingsRate": 0.5
 }

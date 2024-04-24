@@ -1,15 +1,8 @@
 package org.example;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import java.io.*;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Objects;
 import java.util.Scanner;
+
 import static org.apache.poi.ss.formula.functions.FinanceLib.pmt;
 
 public class Main {
@@ -48,28 +41,73 @@ public class Main {
         double currentSalary = config.getStartingSalary() - config.getBiYearlySalaryGrowth(); // Account for initial
         int monthlySpend = config.getMonthlySpend();
         int rent = config.getRent();
+        boolean spendingFirst = config.isSpendingFirst();
+        int targetMonthlySpending = config.getTargetMonthlySpending();
+        int targetSavingsRatePercent = config.getTargetSavingsRatePercent();
 
         int salaryAdjustmentToggle = 0;
 
-        while (currentYear < config.getBirthday().plusYears(config.getRetirementAge()).getYear()) {
-            currentSalary = salaryAdjustmentToggle == 0 ? currentSalary + biYearlySalaryGrowth : currentSalary;
-            accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, monthlySpend, rent, ny);
-            monthlySpend = inflationAdjust(monthlySpend, inflationPercent);
-            rent = inflationAdjust(rent, inflationPercent + 1);
 
-            updateTaxBrackets();
-            currentYear++;
-            salaryAdjustmentToggle = -salaryAdjustmentToggle + 1;
+        if (spendingFirst) {
+            int withdrawalYears = birthday.plusYears(100).getYear() - birthday.plusYears(currentYear).getYear();
+            double initialWithdrawal = pmt(apyAfterInflation / 100, withdrawalYears, accumulatedSavings * -1, 0, true);
+            double spendToRentRatio = (double) monthlySpend / rent;
+
+            while (initialWithdrawal / 12 < targetMonthlySpending && currentYear < birthday.getYear() + 100) {
+                currentSalary = salaryAdjustmentToggle == 0 ? currentSalary + biYearlySalaryGrowth : currentSalary;
+                accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, monthlySpend, rent, ny);
+                monthlySpend = inflationAdjust(monthlySpend, inflationPercent);
+                rent = inflationAdjust(rent, inflationPercent + 1);
+
+                double netIncome = calculateAnnualNetIncome(currentSalary, ny);
+
+                double maxMonthlySpending = (netIncome / 12) * (1 - targetSavingsRatePercent / 100.0);
+                double currentMonthlySpending = monthlySpend + rent;
+
+                if (currentMonthlySpending < (Math.min(maxMonthlySpending, targetMonthlySpending))) {
+                    double newMonthlySpend = Math.min(maxMonthlySpending, targetMonthlySpending);
+                    System.out.println("\nLifestyle upgrade!\n" + "Age: " + (currentYear - birthday.getYear()) + "\nNew allowance: $" + (int) newMonthlySpend);
+                    monthlySpend = (int) (newMonthlySpend / (1 + spendToRentRatio));
+                    rent = (int) newMonthlySpend - monthlySpend;
+                }
+
+                updateTaxBrackets();
+                currentYear++;
+                salaryAdjustmentToggle = -salaryAdjustmentToggle + 1;
+
+                withdrawalYears = birthday.plusYears(100).getYear() - (currentYear - birthday.getYear());
+                initialWithdrawal = pmt(apyAfterInflation / 100, withdrawalYears, accumulatedSavings * -1, 0, true);
+            }
+            System.out.println("\n------------------------------------------------");
+
+            if (initialWithdrawal / 12 >= targetMonthlySpending) {
+                System.out.println("\nRetirement reached!");
+                System.out.println("\nAge: " + (currentYear - birthday.getYear()));
+                System.out.println("\nYear 1 monthly spending: " + initialWithdrawal / 12);
+            } else {
+                System.out.println("\nSimulation failure: retirement spending target not achieved by age 100");
+            }
+        } else {
+            while (currentYear < config.getBirthday().plusYears(config.getRetirementAge()).getYear()) {
+                currentSalary = salaryAdjustmentToggle == 0 ? currentSalary + biYearlySalaryGrowth : currentSalary;
+                accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, monthlySpend, rent, ny);
+                monthlySpend = inflationAdjust(monthlySpend, inflationPercent);
+                rent = inflationAdjust(rent, inflationPercent + 1);
+
+                updateTaxBrackets();
+                currentYear++;
+                salaryAdjustmentToggle = -salaryAdjustmentToggle + 1;
+            }
+
+                System.out.println("\n------------------------------------------------");
+                System.out.println("\nTotal savings (in today's dollars): \n$" + accumulatedSavings);
+
+                int withdrawalYears = birthday.plusYears(100).getYear() - birthday.plusYears(retirementAge).getYear();
+                double initialWithdrawal = pmt(apyAfterInflation / 100, withdrawalYears, accumulatedSavings * -1, 0, true);
+
+                System.out.println("\nYear 1 monthly withdrawals (in today's dollars): \n$" + Math.round(initialWithdrawal / 12));
+            }
         }
-
-        System.out.println("\n------------------------------------------------");
-        System.out.println("\nTotal savings (in today's dollars): \n$" + accumulatedSavings);
-
-        int withdrawalYears = birthday.plusYears(100).getYear() - birthday.plusYears(retirementAge).getYear();
-        double initialWithdrawal = pmt(apyAfterInflation / 100, withdrawalYears, accumulatedSavings * -1, 0, true);
-
-        System.out.println("\nYear 1 monthly withdrawals (in today's dollars): \n$" + Math.round(initialWithdrawal / 12));
-    }
 
     private static int updateSavings(int accumulatedSavings, double currentSalary, int monthlySpend, int rent, int ny) {
         double netIncome = calculateAnnualNetIncome(currentSalary, ny);
