@@ -12,8 +12,26 @@ public class Config {
     private int startingSavings;
     private int ny;
     private boolean spendingFirst;
+    private boolean maxSpending;
     private int targetMonthlySpending;
     private int targetSavingsRatePercent;
+    private int monthlyHealthInsurance;
+
+    public int getMonthlyHealthInsurance() {
+        return monthlyHealthInsurance;
+    }
+
+    public void setMonthlyHealthInsurance(int monthlyHealthInsurance) {
+        this.monthlyHealthInsurance = monthlyHealthInsurance;
+    }
+
+    public boolean isMaxSpending() {
+        return maxSpending;
+    }
+
+    public void setMaxSpending(boolean maxSpending) {
+        this.maxSpending = maxSpending;
+    }
 
     public int getTargetSavingsRatePercent() {
         return targetSavingsRatePercent;
