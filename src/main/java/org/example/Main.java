@@ -1,6 +1,5 @@
 package org.example;
 
-import java.time.LocalDate;
 import java.util.Scanner;
 
 import static org.apache.poi.ss.formula.functions.FinanceLib.pmt;
@@ -41,6 +40,8 @@ public class Main {
         int monthlySpend = config.getMonthlySpend();
         int rent = config.getRent();
         boolean spendingFirst = config.isSpendingFirst();
+        boolean maxSpending = config.isMaxSpending();
+        int monthlyHealthInsurance = config.getMonthlyHealthInsurance();
         int targetMonthlySpending = config.getTargetMonthlySpending();
         int targetSavingsRatePercent = config.getTargetSavingsRatePercent();
 
@@ -53,17 +54,23 @@ public class Main {
 
             while (initialWithdrawal / 12 < targetMonthlySpending && currentAge < 100) {
                 currentSalary = salaryAdjustmentToggle == 0 ? currentSalary + biYearlySalaryGrowth : currentSalary;
-                accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, monthlySpend, rent, ny);
+                accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, monthlySpend, rent, ny, monthlyHealthInsurance);
                 monthlySpend = inflationAdjust(monthlySpend, inflationPercent);
                 rent = inflationAdjust(rent, inflationPercent + 1);
 
-                double netIncome = calculateAnnualNetIncome(currentSalary, ny);
+                double netIncome = calculateAnnualNetIncome(currentSalary, ny, monthlyHealthInsurance);
 
-                double maxMonthlySpending = (netIncome / 12) * (1 - targetSavingsRatePercent / 100.0);
+                double maxMonthlySpending = ((netIncome + preTaxRetirementLimit) / 12) * (1 - targetSavingsRatePercent / 100.0);
                 double currentMonthlySpending = monthlySpend + rent;
 
-                if (currentMonthlySpending < (Math.min(maxMonthlySpending, targetMonthlySpending))) {
-                    double newMonthlySpend = Math.min(maxMonthlySpending, targetMonthlySpending);
+                double maxSpend = maxSpending ? maxMonthlySpending : Math.min(maxMonthlySpending, targetMonthlySpending);
+
+                System.out.println(netIncome);
+                System.out.println(maxMonthlySpending);
+                System.out.println(currentMonthlySpending);
+
+                if (currentMonthlySpending < maxSpend) {
+                    double newMonthlySpend = maxSpend;
                     System.out.println("\nLifestyle upgrade!\n" + "Age: " + currentAge + "\nNew allowance: $" + (int) newMonthlySpend);
                     monthlySpend = (int) (newMonthlySpend / (1 + spendToRentRatio));
                     rent = (int) newMonthlySpend - monthlySpend;
@@ -72,6 +79,7 @@ public class Main {
                 updateTaxBrackets();
                 currentAge++;
                 salaryAdjustmentToggle = -salaryAdjustmentToggle + 1;
+                monthlyHealthInsurance += monthlyHealthInsurance * 0.035;
 
                 withdrawalYears--;
                 initialWithdrawal = pmt(apyAfterInflation / 100, withdrawalYears, accumulatedSavings * -1, 0, true);
@@ -88,7 +96,7 @@ public class Main {
         } else {
             while (currentAge < config.getRetirementAge()) {
                 currentSalary = salaryAdjustmentToggle == 0 ? currentSalary + biYearlySalaryGrowth : currentSalary;
-                accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, monthlySpend, rent, ny);
+                accumulatedSavings = updateSavings(accumulatedSavings, currentSalary, monthlySpend, rent, ny, monthlyHealthInsurance);
                 monthlySpend = inflationAdjust(monthlySpend, inflationPercent);
                 rent = inflationAdjust(rent, inflationPercent + 1);
 
@@ -107,9 +115,9 @@ public class Main {
             }
         }
 
-    private static int updateSavings(int accumulatedSavings, double currentSalary, int monthlySpend, int rent, int ny) {
-        double netIncome = calculateAnnualNetIncome(currentSalary, ny);
-        int monthlySavings = (int) Math.floor(netIncome / 12) - (monthlySpend + rent);
+    private static int updateSavings(int accumulatedSavings, double currentSalary, int monthlySpend, int rent, int ny, int healthInsurance) {
+        double netIncome = calculateAnnualNetIncome(currentSalary, ny, healthInsurance);
+        int monthlySavings = (int) (Math.floor(netIncome / 12) - (monthlySpend + rent)) + (int) preTaxRetirementLimit / 12;
         return (int) Math.floor(compound(accumulatedSavings, apyAfterInflation / 100, monthlySavings));
     }
 
@@ -125,11 +133,11 @@ public class Main {
         preTaxRetirementLimit = inflationAdjust(preTaxRetirementLimit, inflationPercent - 0.25);
     }
 
-    public static double calculateAnnualNetIncome (double yearlySalary, int ny) {
+    public static double calculateAnnualNetIncome (double yearlySalary, int ny, int monthlyHealthInsurance) {
         double socialSecurityDeduction = Math.min(yearlySalary * socialSecurityTaxRate,
                 socialSecurityWageLimit * socialSecurityTaxRate);
         double medicareDeduction = yearlySalary * medicareTaxRate;
-        double taxableIncome = yearlySalary - socialSecurityDeduction - medicareDeduction - standardDeduction - preTaxRetirementLimit;
+        double taxableIncome = yearlySalary - socialSecurityDeduction - medicareDeduction - standardDeduction - preTaxRetirementLimit - (monthlyHealthInsurance * 12);
         double incomeTax = 0.0;
 
         for (int i = 1; i < brackets.length; i++) {
@@ -156,7 +164,7 @@ public class Main {
             incomeTax += nyIncomeTax;
         }
 
-        return yearlySalary - socialSecurityDeduction - medicareDeduction - incomeTax;
+        return yearlySalary - socialSecurityDeduction - medicareDeduction - incomeTax - preTaxRetirementLimit - (monthlyHealthInsurance * 12);
     }
 
     public static double compound(double principal, double rate, double contribution) {
