@@ -92,7 +92,7 @@ public class ConfigService {
             } else if (fieldToUpdate.getType() == int.class) {
                 fieldToUpdate.setInt(config, getIntFromUser("Enter new " + fieldToUpdate.getName() + ": "));
             } else if (fieldToUpdate.getType() == boolean.class) {
-                fieldToUpdate.setBoolean(config, getBooleanFromUser("Spending top priority? true/false"));
+                fieldToUpdate.setBoolean(config, getBooleanFromUser("Like money? true/false"));
             } else {
                 System.out.println("Update not supported for the selected field type.");
             }
